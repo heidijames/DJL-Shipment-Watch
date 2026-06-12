@@ -37,16 +37,20 @@ def get_risk_level(risk_score: int) -> str:
 
 #-------Core Business Logic Function----------------------------
 def monitor_shipment_value(shipment_id: str):
+    
+    """
+    Retrieve shipment information and calculate cargo risk.
+    """
+          
     shipment_id = shipment_id.strip().upper()
 
     update_data = shipping_line_updates()
     updates = update_data["updates"]
-
+    
     if shipment_id not in updates:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Shipment ID not found: {shipment_id}"
-        )
+        return {
+            "error": f"Shipment ID not found: {shipment_id}"
+        }
 
     update = updates[shipment_id]
 
@@ -67,13 +71,29 @@ def monitor_shipment_value(shipment_id: str):
         "delay_days": delay_days,
         "risk_score": risk_score,
         "risk_level": risk_level,
-        "update_note": update.get("update_note"),
+        "cause_of_delay": update.get("update_note"),
     }
 
-
+# --- FastAPI Endpoints -------------------------------------------------------
 @router.post("/monitor-shipment")
 def monitor_shipment(request: MonitorShipmentRequest):
-    return monitor_shipment_value(request.shipment_id)
+
+    """
+    HTTP endpoint: monitor shipment status and cargo risk.
+    """
+
+    result = monitor_shipment_value(
+        request.shipment_id
+    )
+
+    if "error" in result:
+        raise HTTPException(
+            status_code=404,
+            detail=result["error"]
+        )
+
+    return result
+
 
 TOOL_DEFINITIONS = [
     {

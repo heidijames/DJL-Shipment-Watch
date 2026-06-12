@@ -1,4 +1,4 @@
-"""Prompt templates used by the unit converter tutorial."""
+"""Prompt templates used by the DJL RiskWatch system."""
 
 from __future__ import annotations
 
