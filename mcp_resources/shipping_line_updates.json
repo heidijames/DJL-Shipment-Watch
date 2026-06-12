@@ -37,5 +37,15 @@
     "eta": "2026-06-22",
     "delay_days": 0,
     "update_note": "Vessel departed previous port."
-  }
+  },
+
+ "SHP005": {
+   "shipping_line": "ONE",
+   "cargo_category": "Perishable",
+   "current_status": "Delayed",
+   "current_location": "Antwerp",
+   "eta": "2026-06-25",
+   "delay_days": 5,
+   "update_note": "Shipment delayed due to severe weather conditions."
+ }
 }
