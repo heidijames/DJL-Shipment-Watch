@@ -1,161 +1,85 @@
-# Conversion logic and HTTP endpoints are defined here so they can be reused
-# by both the FastAPI app and the MCP tool registrations.
+"""RiskWatch tool and HTTP endpoint for monitoring shipments."""
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, Field
 
-router = APIRouter(prefix="", tags=["unit-conversion"])
+from mcp_resources.converter_resources import shipping_line_updates
 
 
-# --- Core conversion helpers -------------------------------------------------
+router = APIRouter(prefix="", tags=["riskwatch"])
 
-#Executes
-def celsius_to_fahrenheit_value(celsius: float) -> float:
+
+CARGO_RISK_SCORES = {
+    "General": 10,
+    "Temperature Sensitive": 40,
+    "Perishable": 40,
+}
+
+#---------- Request Model -----------------------------------
+
+class MonitorShipmentRequest(BaseModel):
+    shipment_id: str = Field(min_length=1)
+
+#-------- Helper Function -------------------------------------
+def get_risk_level(risk_score: int) -> str:
     """
-    Convert Celsius to Fahrenheit using (°C × 9/5) + 32.
-
-    Args:
-        celsius: Temperature in Celsius.
-
-    Returns:
-        The Fahrenheit temperature.
+    Convert a numerical risk score into a risk level.
     """
-    return (celsius * 9 / 5) + 32
+
+    if risk_score >= 70:
+        return "High"
+
+    elif risk_score >= 40:
+        return "Medium"
+
+    else:
+        return "Low"
+
+#-------Core Business Logic Function----------------------------
+def monitor_shipment_value(shipment_id: str):
+    shipment_id = shipment_id.strip().upper()
+
+    update_data = shipping_line_updates()
+    updates = update_data["updates"]
+
+    if shipment_id not in updates:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Shipment ID not found: {shipment_id}"
+        )
+
+    update = updates[shipment_id]
+
+    cargo_category = update.get("cargo_category")
+    delay_days = update.get("delay_days", 0)
+
+    cargo_risk_score = CARGO_RISK_SCORES.get(cargo_category, 10)
+    risk_score = cargo_risk_score + (delay_days * 10)
+    risk_level = get_risk_level(risk_score)
+
+    return {
+        "shipment_id": shipment_id,
+        "shipping_line": update.get("shipping_line"),
+        "cargo_category": cargo_category,
+        "current_status": update.get("current_status"),
+        "current_location": update.get("current_location"),
+        "eta": update.get("eta"),
+        "delay_days": delay_days,
+        "risk_score": risk_score,
+        "risk_level": risk_level,
+        "update_note": update.get("update_note"),
+    }
 
 
-def fahrenheit_to_celsius_value(fahrenheit: float) -> float:
-    """
-    Convert Fahrenheit to Celsius using (°F − 32) × 5/9.
-
-    Args:
-        fahrenheit: Temperature in Fahrenheit.
-
-    Returns:
-        The Celsius temperature.
-    """
-    return (fahrenheit - 32) * 5 / 9
-
-
-def kilometers_to_miles_value(kilometers: float) -> float:
-    """
-    Convert kilometers to miles with the 0.621371 factor.
-
-    Args:
-        kilometers: Distance in kilometers.
-
-    Returns:
-        The distance in miles.
-    """
-    return kilometers * 0.621371
-
-
-def miles_to_kilometers_value(miles: float) -> float:
-    """
-    Convert miles to kilometers, rejecting negative inputs.
-
-    Args:
-        miles: Distance in miles.
-
-    Returns:
-        The distance in kilometers.
-
-    Raises:
-        ValueError: If a negative distance is provided.
-    """
-    if miles < 0:
-        raise ValueError("Distance cannot be negative")
-    return miles / 0.621371
-
-
-# --- FastAPI endpoints -------------------------------------------------------
-
-@router.post("/celsius-to-fahrenheit")
-def celsius_to_fahrenheit(celsius: float):
-    """
-    HTTP endpoint: convert Celsius to Fahrenheit.
-
-    Args:
-        celsius: Temperature in Celsius.
-
-    Returns:
-        JSON dict with the result and operation name.
-    """
-    result = celsius_to_fahrenheit_value(celsius)
-    return {"result": result, "operation": "celsius_to_fahrenheit"}
-
-
-@router.post("/fahrenheit-to-celsius")
-def fahrenheit_to_celsius(fahrenheit: float):
-    """
-    HTTP endpoint: convert Fahrenheit to Celsius.
-
-    Args:
-        fahrenheit: Temperature in Fahrenheit.
-
-    Returns:
-        JSON dict with the result and operation name.
-    """
-    result = fahrenheit_to_celsius_value(fahrenheit)
-    return {"result": result, "operation": "fahrenheit_to_celsius"}
-
-
-@router.post("/kilometers-to-miles")
-def kilometers_to_miles(kilometers: float):
-    """
-    HTTP endpoint: convert kilometers to miles.
-
-    Args:
-        kilometers: Distance in kilometers.
-
-    Returns:
-        JSON dict with the result and operation name.
-    """
-    result = kilometers_to_miles_value(kilometers)
-    return {"result": result, "operation": "kilometers_to_miles"}
-
-
-@router.post("/miles-to-kilometers")
-def miles_to_kilometers(miles: float):
-    """
-    HTTP endpoint: convert miles to kilometers with input validation.
-
-    Args:
-        miles: Distance in miles.
-
-    Returns:
-        JSON dict with the result and operation name, or an error message.
-    """
-    try:
-        result = miles_to_kilometers_value(miles)
-        return {"result": result, "operation": "miles_to_kilometers"}
-    except ValueError as exc:  # Keep HTTP response friendly
-        return {"error": str(exc), "operation": "miles_to_kilometers"}
-
-
-# --- Metadata for MCP tool registration ----
+@router.post("/monitor-shipment")
+def monitor_shipment(request: MonitorShipmentRequest):
+    return monitor_shipment_value(request.shipment_id)
 
 TOOL_DEFINITIONS = [
     {
-        "name": "celsius_to_fahrenheit",
-        "description": "Convert Celsius temperature to Fahrenheit",
-        "func": celsius_to_fahrenheit_value,
-        "tags": {"temperature", "conversion"},
-    },
-    {
-        "name": "fahrenheit_to_celsius",
-        "description": "Convert Fahrenheit temperature to Celsius",
-        "func": fahrenheit_to_celsius_value,
-        "tags": {"temperature", "conversion"},
-    },
-    {
-        "name": "kilometers_to_miles",
-        "description": "Convert kilometers to miles",
-        "func": kilometers_to_miles_value,
-        "tags": {"distance", "conversion"},
-    },
-    {
-        "name": "miles_to_kilometers",
-        "description": "Convert miles to kilometers (validates non‑negative input)",
-        "func": miles_to_kilometers_value,
-        "tags": {"distance", "conversion"},
-    },
+        "name": "monitor_shipment",
+        "description": "Monitor shipment status and assess basic cargo risk.",
+        "func": monitor_shipment_value,
+        "tags": {"shipment", "monitoring", "cargo-risk", "logistics"},
+    }
 ]
