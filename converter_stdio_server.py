@@ -23,7 +23,7 @@ configure_logging(
     )
 )
 
-mcp = FastMCP("Unit Converter (STDIO)")
+mcp = FastMCP("DJL Shipment Watch (STDIO)")
 
 # TODO To run the stdio server only using npx @modelcontextprotocol/inspector python converter_stdio_server.py
 
