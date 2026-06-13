@@ -1,236 +1,298 @@
-# Unit Converter API + MCP Tutorial
+# DJL Shipment Watch API + MCP Server
 
-- builds the FastAPI app, wraps it with FastMCP, mounts MCP HTTP/SSE endpoints, registers resources and prompts, and starts uvicorn.
-- requirements.txt – Python dependencies.
+DJL Shipment Watch is a simplified logistics monitoring system built using FastAPI and FastMCP.
+
+The system provides:
+
+* Shipment monitoring by shipment ID
+* Shipping line status lookup
+* Basic cargo risk assessment
+* One MCP tool
+* One MCP resource
+* One MCP prompt
+* HTTP API endpoint through FastAPI
+* MCP access through Streamable HTTP
+
+---
 
 ## Prerequisites
 
-- Python 3.10+ (tested with 3.12).
-- Virtual environment.
-- npm inspector below.
+* Python 3.10+
+* Virtual environment
+* npm for MCP Inspector
 
-⸻
+---
 
 ## Setup from this folder
 
 ```bash
 python -m venv .venv
 
-# Mac or Gitbash
-source .venv/bin/activate
+# Git Bash
+source .venv/Scripts/activate
 
-# Windows powershell:
+# Windows PowerShell
 .venv\Scripts\activate
+
 python -m pip install -r requirements.txt
 ```
 
-⸻
+---
 
-## Run the HTTP + MCP server
+## Run the HTTP + MCP Server
 
 ```bash
-# start the server
 python converter_streamable_http_server.py
-
-# or
-python -m converter_streamable_http_server
-
 ```
 
-You’ll see:
+You should see:
 
-- Swagger UI: http://localhost:8003/docs
-- ReDoc: http://localhost:8003/redoc
+```text
+Swagger UI:
+http://localhost:8003/docs
 
-MCP endpoints served by FastMCP:
+ReDoc:
+http://localhost:8003/redoc
 
-- streamable-http: http://localhost:8003/mcp
-- SSE: http://localhost:8003/sse
+MCP Endpoint:
+http://localhost:8003/mcp/
 
-⸻
+SSE Endpoint:
+http://localhost:8003/sse
+```
 
-## Try the HTTP endpoints (curl)
+---
+
+## Open MCP Inspector
+
+With the server running, open a new terminal and run:
 
 ```bash
-curl -X POST "http://localhost:8003/miles-to-kilometers?miles=3.1" \
- -H "Authorization: Bearer 143f4a46d74fee0d7918b2857577868cb3daf9e6e50ee91c2f7975ba26fdb8f7"
-
-# If we use pydantic models
-curl -X POST "http://localhost:8003/miles-to-kilometers" \
- -H "Content-Type: application/json" \
- -H "Authorization: Bearer Y658139cf61948208ed76a4b36122b9552ec5c3f6da5e02f7c5d85d995dede17dE" \
- -d "3.1"
+npx @modelcontextprotocol/inspector@latest \
+-e DUMMY=1 \
+--url http://localhost:8003/mcp/ \
+--transport streamable-http
 ```
+npx @modelcontextprotocol/inspector python converter_stdio_server.py
+
+Open the displayed Inspector URL in your browser.
+
+---
+
+## MCP Components
+
+### Tool
+
+* monitor_shipment
+
+### Resource
+
+* resource://shipping_line_updates
+
+### Prompt
+
+* shipment_monitoring
+
+---
+
+## Supported Input
+
+### Shipment ID Examples
+
+```text
+SHP001
+SHP002
+SHP003
+SHP004
+SHP005
+```
+
+---
+
+## HTTP Endpoint Testing
+
+### Monitor Shipment
 
 ```bash
-# Celsius → Fahrenheit
-curl -X POST "http://localhost:8003/celsius-to-fahrenheit" \
- -H "Content-Type: application/json" \
- -d "25"
-```
-
-```bash
-# Fahrenheit → Celsius
-curl -X POST "http://localhost:8003/fahrenheit-to-celsius" \
- -H "Content-Type: application/json" \
- -d "86"
-```
-
-```bash
-# Kilometers → Miles
-curl -X POST "http://localhost:8003/kilometers-to-miles" \
- -H "Content-Type: application/json" \
- -d "5"
-```
-
-```bash
-# Miles → Kilometers (rejects negative values)
-curl -X POST "http://localhost:8003/miles-to-kilometers" \
- -H "Content-Type: application/json" \
- -d "3.1"
-```
-
-Each endpoint returns JSON like:
-
-- { "result": <number>, "operation": "..." } or { "error": "..." } for invalid input.
-
-## Headers & Authentication (common to all)
-
-### Add JSON content type (and optionally your auth token)
-
+curl -X POST "http://localhost:8003/monitor-shipment" \
 -H "Content-Type: application/json" \
--H "Authorization: Bearer <TOKEN>"
+-d '{
+  "shipment_id":"SHP002"
+}'
+```
 
-Our server doesn’t require auth yet, we can omit the **Authorization** header.
-
-## Use with MCP (VS Code Example)
-
-1. Start the server as above.
-2. Point your MCP client to the process.
+Example response:
 
 ```json
-// Example VS Code .vscode/mcp.json entry:
 {
-  "servers": {
-    "UnitConverter": {
-      "command": "python",
-      "args": ["converter_api_tutorial.py"]
-    }
-  }
+  "shipment_id": "SHP002",
+  "shipping_line": "MSC",
+  "cargo_category": "Temperature Sensitive",
+  "current_status": "Delayed",
+  "current_location": "Port Klang",
+  "eta": "2026-06-18",
+  "delay_days": 3,
+  "risk_score": 60,
+  "risk_level": "Medium",
+  "update_note": "Shipment is delayed due to port congestion."
 }
 ```
 
-3. From the MCP client, list artifacts. You should see:
-   - Tools: celsius_to_fahrenheit, fahrenheit_to_celsius, kilometers_to_miles, miles_to_kilometers
-   - Resources: resource://unit_reference, resource://troubleshooting_guide
-   - Prompts: explain_conversion, api_usage
+---
 
-⸻
+## Obtaining an MCP Session ID
 
-## Inspect with the npm MCP Inspector
+The Streamable HTTP MCP endpoint requires a valid session ID before JSON-RPC requests can be executed.
 
-- explore everything (tools, resources, prompts) in a browser.
-- with the server already running on http://localhost:8003
+Run:
 
 ```bash
-# If env error appears
-npx @modelcontextprotocol/inspector@latest -e DUMMY=1 --url http://localhost:8003/mcp --transport streamable-http
-
-# If you want to test the older HTTP:
-npx @modelcontextprotocol/inspector@latest -e DUMMY=1 --url http://localhost:8003/mcp --transport http
-
-# If you want to test the deprecated SSE:
-npx @modelcontextprotocol/inspector@latest -e DUMMY=1 --url http://localhost:8003/sse --transport sse
+curl -i http://localhost:8003/mcp/
 ```
 
-## To run the STDIO server only
+Copy the value returned in:
 
-```bash
-# If venv is ".venv", change to .\.venv\Scripts\python.exe
-npx @modelcontextprotocol/inspector python converter_stdio_server.py
+```text
+mcp-session-id
 ```
 
-- UI runs on localhost:5173 by default.
-- Change UI port if needed: CLIENT_PORT=8080 npx @modelcontextprotocol/inspector --url http://localhost:8003/mcp --transport http
-- Add headers if required: --header "Authorization: Bearer TOKEN".
+Use it in subsequent MCP JSON-RPC requests.
 
-## JSON-RPC Examples for Prompts & Resources
+---
 
-1. List all prompts
+## MCP JSON-RPC Testing
+
+Replace `<SESSION_ID>` with your actual MCP session ID.
+
+### List Tools
 
 ```bash
-curl -s -X POST <SERVER_URL> \
+curl -N -X POST "http://localhost:8003/mcp/" \
 -H "Content-Type: application/json" \
--d '{"jsonrpc":"2.0","method":"prompts/list","params":{},"id":1}'
+-H "Accept: application/json, text/event-stream" \
+-H "mcp-session-id:<SESSION_ID>" \
+-d '{"jsonrpc":"2.0","method":"tools/list","params":{},"id":1}'
 ```
 
-⸻
-
-2. Get a specific prompt
+### List Resources
 
 ```bash
-curl -s -X POST <SERVER_URL> \
+curl -N -X POST "http://localhost:8003/mcp/" \
 -H "Content-Type: application/json" \
--d '{"jsonrpc":"2.0","method":"prompts/get","params":{"name":"summarize"},"id":2}'
+-H "Accept: application/json, text/event-stream" \
+-H "mcp-session-id:<SESSION_ID>" \
+-d '{"jsonrpc":"2.0","method":"resources/list","params":{},"id":2}'
 ```
 
-⸻
-
-3. Render/execute a prompt with variables
+### Read Shipping Line Updates Resource
 
 ```bash
-curl -s -X POST <SERVER_URL> \
+curl -N -X POST "http://localhost:8003/mcp/" \
 -H "Content-Type: application/json" \
--d '{"jsonrpc":"2.0","method":"prompts/render","params":{"name":"summarize","variables":{"text":"This is the content to summarize","tone":"neutral"}},"id":3}'
+-H "Accept: application/json, text/event-stream" \
+-H "mcp-session-id:<SESSION_ID>" \
+-d '{"jsonrpc":"2.0","method":"resources/read","params":{"uri":"resource://shipping_line_updates"},"id":3}'
 ```
 
-4. List available resources
+### List Prompts
 
 ```bash
-curl -s -X POST <SERVER_URL> \
+curl -N -X POST "http://localhost:8003/mcp/" \
 -H "Content-Type: application/json" \
--d '{"jsonrpc":"2.0","method":"resources/list","params":{},"id":4}'
+-H "Accept: application/json, text/event-stream" \
+-H "mcp-session-id:<SESSION_ID>" \
+-d '{"jsonrpc":"2.0","method":"prompts/list","params":{},"id":4}'
 ```
 
-5. Read a resource by URI
+### Get Shipment Monitoring Prompt
 
 ```bash
-curl -s -X POST <SERVER_URL> \
+curl -N -X POST "http://localhost:8003/mcp/" \
 -H "Content-Type: application/json" \
--d '{"jsonrpc":"2.0","method":"resources/read","params":{"uri":"file:///data/report.pdf"},"id":5}'
+-H "Accept: application/json, text/event-stream" \
+-H "mcp-session-id:<SESSION_ID>" \
+-d '{"jsonrpc":"2.0","method":"prompts/get","params":{"name":"shipment_monitoring"},"id":5}'
 ```
 
-6. Search resources (if supported)
+---
 
-```bash
-curl -s -X POST <SERVER_URL> \
--H "Content-Type: application/json" \
--d '{"jsonrpc":"2.0","method":"resources/search","params":{"query":"error OR exception","limit":50},"id":6}'
+## MCP Inspector Testing
+
+Use MCP Inspector to verify:
+
+### Tool
+
+* monitor_shipment
+
+### Resource
+
+* shipping_line_updates
+
+### Prompt
+
+* shipment_monitoring
+
+---
+
+## Project Structure
+
+```text
+DJL Shipment Watch/
+
+├── converter_streamable_http_server.py
+├── converter_stdio_server.py
+├── requirements.txt
+
+├── mcp_tools/
+│   └── converter_tools.py
+
+├── mcp_resources/
+│   ├── converter_resources.py
+│   └── shipping_line_updates.json
+
+├── mcp_prompts/
+│   └── converter_prompts.py
+
+├── utils/
+│   └── logging_utils.py
+
+├── logs/
+└── README.md
 ```
 
-⸻
+---
 
-## Handling errors
+## Error Handling
 
-- Parse error (-32700)
-- Invalid request (-32600)
-- Method not found (-32601)
-- Invalid params (-32602)
-- Internal error (-32603)
+Common HTTP errors:
 
-## Notes
+* 400 Bad Request
+* 404 Not Found
+* 422 Validation Error
 
-macOS/Linux (bash/zsh)
-• The examples above will work as-is.
+Common JSON-RPC errors:
 
-```bash
-# Windows PowerShell
-curl -Method POST <SERVER_URL> `  -Headers @{ "Content-Type"="application/json" }`
--Body '{"jsonrpc":"2.0","method":"prompts/list","params":{},"id":1}'
-```
+* -32700 Parse Error
+* -32600 Invalid Request
+* -32601 Method Not Found
+* -32602 Invalid Parameters
+* -32603 Internal Error
 
-Windows CMD
+---
 
-```bash
-curl -s -X POST <SERVER_URL> -H "Content-Type: application/json" -d "{\"jsonrpc\":\"2.0\",\"method\":\"prompts/list\",\"params\":{},\"id\":1}"
-```
+## Development Notes
+
+Key issues discovered and resolved during testing:
+
+1. Shipment ID input cleaning using Pydantic
+2. Shipment ID lookup against the JSON resource
+3. Cargo risk calculation based on cargo category and delay days
+4. MCP session ID requirement
+5. Streamable HTTP MCP endpoint requires Accept headers and session-based communication
+
+Testing was completed using:
+
+* Swagger
+* curl
+* MCP Inspector
+* Git version control

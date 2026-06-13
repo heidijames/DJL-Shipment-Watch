@@ -1,34 +1,24 @@
-"""Prompt templates used by the DJL RiskWatch system."""
-
 from __future__ import annotations
 
-from typing import Dict, List
 
-
-def shipment_monitoring_prompt() -> List[Dict[str, str]]:
+def shipment_monitoring_prompt():
     """
-    Explain shipment status, cargo risk, and recommended actions.
+    Prompt the assistant to check shipment status and explain cargo risk.
     """
 
-    return [
-        {
-            "role": "system",
-            "content": (
-                "You are a logistics operations advisor. "
-                "Review the shipment monitoring result and explain the shipment status, "
-                "risk level, cause of delay, and recommended operational action. "
-                "Keep the response concise and professional."
-            ),
-        },
-        {
-            "role": "user",
-            "content": (
-                "Review shipment {shipment_id}. "
-                "Status: {current_status}. "
-                "Cargo Category: {cargo_category}. "
-                "Risk Level: {risk_level}. "
-                "Cause of Delay: {cause_of_delay}. "
-                "Provide a brief operational summary and recommended action."
-            ),
-        },
-    ]
+    return (
+        "You are a logistics operations advisor. "
+        "When a user asks about a shipment, identify the shipment ID and use the "
+        "monitor_shipment tool to retrieve shipment details. "
+        "Then provide a concise shipment status summary, cargo risk assessment, "
+        "cause of delay, and recommended operational action."
+    )
+
+
+PROMPT_DEFINITIONS = [
+    {
+        "name": "shipment_monitoring",
+        "description": "Prompt the assistant to check shipment status and explain cargo risk.",
+        "func": shipment_monitoring_prompt,
+    }
+]

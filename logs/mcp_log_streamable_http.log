@@ -237,3 +237,25 @@
 2026-03-09 14:31:44,726 [TRACE] uvicorn.asgi: ASGI [1] Send {'type': 'lifespan.startup.complete'}
 2026-03-09 14:31:44,726 [INFO] uvicorn.error: Application startup complete.
 2026-03-09 14:31:44,730 [INFO] uvicorn.error: Uvicorn running on http://localhost:8003 (Press CTRL+C to quit)
+2026-06-13 18:24:53,261 [INFO] uvicorn.error: Started server process [36224]
+2026-06-13 18:24:53,263 [INFO] uvicorn.error: Waiting for application startup.
+2026-06-13 18:24:53,264 [TRACE] uvicorn.asgi: ASGI [1] Started scope={'type': 'lifespan', 'asgi': {'version': '3.0', 'spec_version': '2.0'}, 'state': {}}
+2026-06-13 18:24:53,264 [TRACE] uvicorn.asgi: ASGI [1] Receive {'type': 'lifespan.startup'}
+2026-06-13 18:24:53,270 [INFO] mcp.server.streamable_http_manager: StreamableHTTP session manager started
+2026-06-13 18:24:53,270 [TRACE] uvicorn.asgi: ASGI [1] Send {'type': 'lifespan.startup.complete'}
+2026-06-13 18:24:53,270 [INFO] uvicorn.error: Application startup complete.
+2026-06-13 18:24:53,294 [INFO] uvicorn.error: Uvicorn running on http://localhost:8003 (Press CTRL+C to quit)
+2026-06-13 18:25:33,938 [INFO] uvicorn.error: Started server process [37500]
+2026-06-13 18:25:33,938 [INFO] uvicorn.error: Waiting for application startup.
+2026-06-13 18:25:33,938 [TRACE] uvicorn.asgi: ASGI [1] Started scope={'type': 'lifespan', 'asgi': {'version': '3.0', 'spec_version': '2.0'}, 'state': {}}
+2026-06-13 18:25:33,939 [TRACE] uvicorn.asgi: ASGI [1] Receive {'type': 'lifespan.startup'}
+2026-06-13 18:25:33,942 [INFO] mcp.server.streamable_http_manager: StreamableHTTP session manager started
+2026-06-13 18:25:33,942 [TRACE] uvicorn.asgi: ASGI [1] Send {'type': 'lifespan.startup.complete'}
+2026-06-13 18:25:33,942 [INFO] uvicorn.error: Application startup complete.
+2026-06-13 18:25:33,947 [ERROR] uvicorn.error: [Errno 10048] error while attempting to bind on address ('::1', 8003, 0, 0): [winerror 10048] only one usage of each socket address (protocol/network address/port) is normally permitted
+2026-06-13 18:25:33,948 [INFO] uvicorn.error: Waiting for application shutdown.
+2026-06-13 18:25:33,948 [TRACE] uvicorn.asgi: ASGI [1] Receive {'type': 'lifespan.shutdown'}
+2026-06-13 18:25:33,948 [INFO] mcp.server.streamable_http_manager: StreamableHTTP session manager shutting down
+2026-06-13 18:25:33,948 [TRACE] uvicorn.asgi: ASGI [1] Send {'type': 'lifespan.shutdown.complete'}
+2026-06-13 18:25:33,949 [TRACE] uvicorn.asgi: ASGI [1] Completed
+2026-06-13 18:25:33,949 [INFO] uvicorn.error: Application shutdown complete.
