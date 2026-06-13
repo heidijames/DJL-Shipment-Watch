@@ -2,6 +2,7 @@
 # Uses FastAPI for HTTP routes and FastMCP to expose tools/resources/prompts over HTTP/SSE transports.
 from fastapi import FastAPI, APIRouter
 from fastmcp import FastMCP
+import json
 
 from mcp_tools.converter_tools import router as converter_router
 
@@ -77,7 +78,7 @@ mcp = FastMCP.from_fastapi(
     mime_type="application/json",
 )
 def _resource_shipping_line_updates():
-    return shipping_line_updates()
+    return json.dumps(shipping_line_updates(), indent=2)
 
 
 # Prompts

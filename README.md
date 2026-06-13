@@ -23,7 +23,7 @@ The system provides:
 
 ---
 
-## Setup from this folder
+## Setup from this Folder
 
 ```bash
 python -m venv .venv
@@ -63,22 +63,6 @@ http://localhost:8003/sse
 
 ---
 
-## Open MCP Inspector
-
-With the server running, open a new terminal and run:
-
-```bash
-npx @modelcontextprotocol/inspector@latest \
--e DUMMY=1 \
---url http://localhost:8003/mcp/ \
---transport streamable-http
-```
-npx @modelcontextprotocol/inspector python converter_stdio_server.py
-
-Open the displayed Inspector URL in your browser.
-
----
-
 ## MCP Components
 
 ### Tool
@@ -109,7 +93,50 @@ SHP005
 
 ---
 
-## HTTP Endpoint Testing
+# Testing Guide
+
+## 1. Swagger Testing
+
+Open:
+
+```text
+http://localhost:8003/docs
+```
+
+Expand:
+
+```text
+POST /monitor-shipment
+```
+
+Click **Try it Out** and enter:
+
+```json
+{
+  "shipment_id": "SHP002"
+}
+```
+
+Expected response:
+
+```json
+{
+  "shipment_id": "SHP002",
+  "shipping_line": "MSC",
+  "cargo_category": "Temperature Sensitive",
+  "current_status": "Delayed",
+  "current_location": "Port Klang",
+  "eta": "2026-06-18",
+  "delay_days": 3,
+  "risk_score": 70,
+  "risk_level": "High",
+  "cause_of_delay": "Shipment is delayed due to port congestion."
+}
+```
+
+---
+
+## 2. HTTP Endpoint Testing Using curl
 
 ### Monitor Shipment
 
@@ -121,7 +148,7 @@ curl -X POST "http://localhost:8003/monitor-shipment" \
 }'
 ```
 
-Example response:
+Expected response:
 
 ```json
 {
@@ -132,22 +159,66 @@ Example response:
   "current_location": "Port Klang",
   "eta": "2026-06-18",
   "delay_days": 3,
-  "risk_score": 60,
-  "risk_level": "Medium",
-  "update_note": "Shipment is delayed due to port congestion."
+  "risk_score": 70,
+  "risk_level": "High",
+  "cause_of_delay": "Shipment is delayed due to port congestion."
 }
 ```
 
 ---
 
-## Obtaining an MCP Session ID
+## 3. MCP Inspector Testing
 
-The Streamable HTTP MCP endpoint requires a valid session ID before JSON-RPC requests can be executed.
+Keep the server running.
+
+Open a new terminal and run:
+
+```bash
+npx @modelcontextprotocol/inspector@latest \
+-e DUMMY=1 \
+--url http://localhost:8003/mcp/ \
+--transport streamable-http
+```
+
+The terminal will display an Inspector URL.
+
+Open the URL in your browser.
+
+Verify the following components are visible:
+
+### Tool
+
+* monitor_shipment (may appear with an auto-generated FastMCP endpoint name depending on FastMCP version)
+
+### Resource
+
+* resource://shipping_line_updates
+
+### Prompt
+
+* shipment_monitoring
+
+---
+
+## 4. MCP JSON-RPC Testing Using curl
+
+### Step 1 – Obtain an MCP Session ID
+
+The Streamable HTTP MCP endpoint requires a valid session ID.
 
 Run:
 
 ```bash
-curl -i http://localhost:8003/mcp/
+curl -i "http://localhost:8003/mcp/" \
+-H "Accept: application/json, text/event-stream"
+```
+
+Example response:
+
+```text
+HTTP/1.1 400 Bad Request
+
+mcp-session-id: de6a50e0292e4302bb22519122b5ac10
 ```
 
 Copy the value returned in:
@@ -156,15 +227,13 @@ Copy the value returned in:
 mcp-session-id
 ```
 
-Use it in subsequent MCP JSON-RPC requests.
+and use it in subsequent MCP requests.
 
 ---
 
-## MCP JSON-RPC Testing
+### Step 2 – List Tools
 
-Replace `<SESSION_ID>` with your actual MCP session ID.
-
-### List Tools
+Replace `<SESSION_ID>` with your MCP session ID.
 
 ```bash
 curl -N -X POST "http://localhost:8003/mcp/" \
@@ -174,7 +243,9 @@ curl -N -X POST "http://localhost:8003/mcp/" \
 -d '{"jsonrpc":"2.0","method":"tools/list","params":{},"id":1}'
 ```
 
-### List Resources
+---
+
+### Step 3 – List Resources
 
 ```bash
 curl -N -X POST "http://localhost:8003/mcp/" \
@@ -184,7 +255,15 @@ curl -N -X POST "http://localhost:8003/mcp/" \
 -d '{"jsonrpc":"2.0","method":"resources/list","params":{},"id":2}'
 ```
 
-### Read Shipping Line Updates Resource
+Expected resource:
+
+```text
+resource://shipping_line_updates
+```
+
+---
+
+### Step 4 – Read Resource
 
 ```bash
 curl -N -X POST "http://localhost:8003/mcp/" \
@@ -194,7 +273,13 @@ curl -N -X POST "http://localhost:8003/mcp/" \
 -d '{"jsonrpc":"2.0","method":"resources/read","params":{"uri":"resource://shipping_line_updates"},"id":3}'
 ```
 
-### List Prompts
+Expected result:
+
+The shipping line update JSON data should be returned.
+
+---
+
+### Step 5 – List Prompts
 
 ```bash
 curl -N -X POST "http://localhost:8003/mcp/" \
@@ -204,7 +289,15 @@ curl -N -X POST "http://localhost:8003/mcp/" \
 -d '{"jsonrpc":"2.0","method":"prompts/list","params":{},"id":4}'
 ```
 
-### Get Shipment Monitoring Prompt
+Expected prompt:
+
+```text
+shipment_monitoring
+```
+
+---
+
+### Step 6 – Get Shipment Monitoring Prompt
 
 ```bash
 curl -N -X POST "http://localhost:8003/mcp/" \
@@ -213,24 +306,6 @@ curl -N -X POST "http://localhost:8003/mcp/" \
 -H "mcp-session-id:<SESSION_ID>" \
 -d '{"jsonrpc":"2.0","method":"prompts/get","params":{"name":"shipment_monitoring"},"id":5}'
 ```
-
----
-
-## MCP Inspector Testing
-
-Use MCP Inspector to verify:
-
-### Tool
-
-* monitor_shipment
-
-### Resource
-
-* shipping_line_updates
-
-### Prompt
-
-* shipment_monitoring
 
 ---
 
@@ -264,13 +339,13 @@ DJL Shipment Watch/
 
 ## Error Handling
 
-Common HTTP errors:
+### Common HTTP Errors
 
 * 400 Bad Request
 * 404 Not Found
 * 422 Validation Error
 
-Common JSON-RPC errors:
+### Common JSON-RPC Errors
 
 * -32700 Parse Error
 * -32600 Invalid Request
@@ -289,6 +364,7 @@ Key issues discovered and resolved during testing:
 3. Cargo risk calculation based on cargo category and delay days
 4. MCP session ID requirement
 5. Streamable HTTP MCP endpoint requires Accept headers and session-based communication
+6. MCP resource serialization using `json.dumps()` for successful `resources/read` operations
 
 Testing was completed using:
 
