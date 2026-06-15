@@ -306,3 +306,9 @@ fastmcp.exceptions.PromptError: Error rendering prompt shipment_monitoring.
 2026-06-13 16:32:10,423 [DEBUG] fastmcp.server.mixins.mcp_operations: [DJL Shipment Watch (STDIO)] Handler called: list_tools
 2026-06-13 16:32:16,180 [INFO] mcp.server.lowlevel.server: Processing request of type CallToolRequest
 2026-06-13 16:32:16,181 [DEBUG] fastmcp.server.mixins.mcp_operations: [DJL Shipment Watch (STDIO)] Handler called: call_tool monitor_shipment with {'shipment_id': 'Banana'}
+2026-06-13 18:26:04,479 [INFO] fastmcp.server.mixins.transport: Starting MCP server 'DJL Shipment Watch (STDIO)' with transport 'stdio'
+2026-06-13 18:26:04,611 [INFO] fastmcp.server.mixins.transport: Starting MCP server 'DJL Shipment Watch (STDIO)' with transport 'stdio'
+2026-06-13 18:26:04,732 [INFO] fastmcp.server.mixins.transport: Starting MCP server 'DJL Shipment Watch (STDIO)' with transport 'stdio'
+2026-06-13 18:26:04,849 [INFO] fastmcp.server.mixins.transport: Starting MCP server 'DJL Shipment Watch (STDIO)' with transport 'stdio'
+2026-06-13 18:26:04,867 [INFO] fastmcp.server.mixins.transport: Starting MCP server 'DJL Shipment Watch (STDIO)' with transport 'stdio'
+2026-06-13 19:13:43,460 [INFO] fastmcp.server.mixins.transport: Starting MCP server 'DJL Shipment Watch (STDIO)' with transport 'stdio'

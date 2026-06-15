@@ -1,0 +1,12 @@
+{
+  "id": "delay-communication-templates",
+  "title": "Delay Communication Templates",
+  "templates": {
+    "minor_delay": {
+      "message": "Shipment {shipment_id} is experiencing a minor delay. The revised ETA is {eta}. We are monitoring the shipment and will provide further updates if required."
+    },
+    "major_delay": {
+      "message": "Shipment {shipment_id} is experiencing a significant delay. The revised ETA is {eta}. Our logistics team is working closely with the carrier and will continue to provide updates as new information becomes available."
+    }
+  }
+}

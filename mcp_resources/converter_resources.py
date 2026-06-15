@@ -1,4 +1,4 @@
-"""Reusable MCP resources for DJL RiskWatch."""
+"""Reusable MCP resources for DJL Shipment Watch."""
 
 from __future__ import annotations
 
@@ -10,6 +10,7 @@ from typing import Any, Dict
 # File location
 BASE_DIR = Path(__file__).parent
 SHIPPING_LINE_FILE = BASE_DIR / "shipping_line_updates.json"
+DELAY_TEMPLATES_FILE = BASE_DIR / "delay_communication_templates.json"
 
 
 def load_json(file_path: Path) -> Dict[str, Any]:
@@ -36,11 +37,27 @@ def shipping_line_updates() -> Dict[str, Any]:
     }
 
 
+def delay_communication_templates() -> Dict[str, Any]:
+    """
+    Provides customer communication templates for shipment delays.
+
+    Returns:
+        Dictionary containing minor and major delay communication templates.
+    """
+    return load_json(DELAY_TEMPLATES_FILE)
+
+
 RESOURCE_DEFINITIONS = [
     {
         "name": "shipping_line_updates",
         "description": "Current shipment status, location, ETA and delay information.",
         "mime_type": "application/json",
         "func": shipping_line_updates,
-    }
+    },
+    {
+        "name": "delay_communication_templates",
+        "description": "Customer communication templates for minor and major shipment delays.",
+        "mime_type": "application/json",
+        "func": delay_communication_templates,
+    },
 ]
