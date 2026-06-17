@@ -1,0 +1,42 @@
+$ curl -N -X POST "http://localhost:8003/mcp/" \
+-H "Content-Type: application/json" \
+-H "Accept: application/json, text/event-stream" \
+-H "MCP-Protocol-Version: 2025-06-18" \
+-H "mcp-session-id:83384ac54b32471f884e19b237be0961" \
+-d '{
+    "jsonrpc": "2.0",
+    "method": "tools/call",
+    "params": {
+        "name": "monitor_shipment_monitor_shipment_post",
+        "arguments": {
+            "shipment_id": "SHP002"
+        }
+    },
+    "id": 8
+}'
+event: message
+data: {
+    "jsonrpc": "2.0",
+    "id": 8,
+    "result": {
+        "content": [
+            {
+                "type": "text",
+                "text": "{\"shipment_id\":\"SHP002\",\"shipping_line\":\"MSC\",\"cargo_category\":\"Temperature Sensitive\",\"current_status\":\"Delayed\",\"current_location\":\"Port Klang\",\"eta\":\"2026-06-18\",\"delay_days\":3,\"risk_score\":70,\"risk_level\":\"High\",\"cause_of_delay\":\"Shipment is delayed due to port congestion.\"}"
+            }
+        ],
+        "structuredContent": {
+            "shipment_id": "SHP002",
+            "shipping_line": "MSC",
+            "cargo_category": "Temperature Sensitive",
+            "current_status": "Delayed",
+            "current_location": "Port Klang",
+            "eta": "2026-06-18",
+            "delay_days": 3,
+            "risk_score": 70,
+            "risk_level": "High",
+            "cause_of_delay": "Shipment is delayed due to port congestion."
+        },
+        "isError": false
+    }
+}

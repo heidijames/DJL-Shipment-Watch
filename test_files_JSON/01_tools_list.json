@@ -1,0 +1,74 @@
+$ curl -N -X POST "http://localhost:8003/mcp/" \
+-H "Content-Type: application/json" \
+-H "Accept: application/json, text/event-stream" \
+-H "MCP-Protocol-Version: 2025-06-18" \
+-H "mcp-session-id:83384ac54b32471f884e19b237be0961" \
+-d '{
+    "jsonrpc": "2.0",
+    "method": "tools/list",
+    "params": {},
+    "id": 1
+}'
+event: message
+data: {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "result": {
+        "tools": [
+            {
+                "name": "monitor_shipment_monitor_shipment_post",
+                "description": "HTTP endpoint: monitor shipment status and cargo risk.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "shipment_id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "title": "Shipment Id"
+                        }
+                    },
+                    "required": [
+                        "shipment_id"
+                    ]
+                },
+                "_meta": {
+                    "fastmcp": {
+                        "tags": [
+                            "riskwatch"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "generate_delay_communication_generate_delay_communicatio",
+                "description": "HTTP endpoint: generate customer delay communication.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "shipment_id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "title": "Shipment Id"
+                        },
+                        "delay_severity": {
+                            "type": "string",
+                            "minLength": 1,
+                            "title": "Delay Severity"
+                        }
+                    },
+                    "required": [
+                        "shipment_id",
+                        "delay_severity"
+                    ]
+                },
+                "_meta": {
+                    "fastmcp": {
+                        "tags": [
+                            "riskwatch"
+                        ]
+                    }
+                }
+            }
+        ]
+    }
+}

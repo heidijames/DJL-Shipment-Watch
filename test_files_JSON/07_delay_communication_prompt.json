@@ -1,0 +1,31 @@
+$ curl -N -X POST "http://localhost:8003/mcp/" \
+-H "Content-Type: application/json" \
+-H "Accept: application/json, text/event-stream" \
+-H "MCP-Protocol-Version: 2025-06-18" \
+-H "mcp-session-id:83384ac54b32471f884e19b237be0961" \
+-d '{
+    "jsonrpc": "2.0",
+    "method": "prompts/get",
+    "params": {
+        "name": "delay_communication",
+        "arguments": {}
+    },
+    "id": 7
+}'
+event: message
+data: {
+    "jsonrpc": "2.0",
+    "id": 7,
+    "result": {
+        "description": "Prompt the assistant to generate a customer shipment delay communication.",
+        "messages": [
+            {
+                "role": "user",
+                "content": {
+                    "type": "text",
+                    "text": "You are a logistics customer service advisor. When a user requests a shipment delay update, identify the shipment ID and delay severity. Use the generate_delay_communication_generate_delay_communication_post tool to create a professional customer-facing delay communication. Keep the message concise, clear, and professional."
+                }
+            }
+        ]
+    }
+}

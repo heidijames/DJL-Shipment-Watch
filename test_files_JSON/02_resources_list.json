@@ -1,0 +1,40 @@
+$ curl -N -X POST "http://localhost:8003/mcp/" \
+-H "Content-Type: application/json" \
+-H "Accept: application/json, text/event-stream" \
+-H "MCP-Protocol-Version: 2025-06-18" \
+-H "mcp-session-id:83384ac54b32471f884e19b237be0961" \
+-d '{
+    "jsonrpc": "2.0",
+    "method": "resources/list",
+    "params": {},
+    "id": 2
+}'
+event: message
+data: {
+    "jsonrpc": "2.0",
+    "id": 2,
+    "result": {
+        "resources": [
+            {
+                "name": "Shipping Line Updates",
+                "uri": "resource://shipping_line_updates",
+                "mimeType": "application/json",
+                "_meta": {
+                    "fastmcp": {
+                        "tags": []
+                    }
+                }
+            },
+            {
+                "name": "Delay Communication Templates",
+                "uri": "resource://delay_communication_templates",
+                "mimeType": "application/json",
+                "_meta": {
+                    "fastmcp": {
+                        "tags": []
+                    }
+                }
+            }
+        ]
+    }
+}

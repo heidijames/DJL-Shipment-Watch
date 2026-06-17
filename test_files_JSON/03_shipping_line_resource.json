@@ -1,0 +1,27 @@
+ curl -N -X POST "http://localhost:8003/mcp/" \
+-H "Content-Type: application/json" \
+-H "Accept: application/json, text/event-stream" \
+-H "MCP-Protocol-Version: 2025-06-18" \
+-H "mcp-session-id:83384ac54b32471f884e19b237be0961" \
+-d '{
+    "jsonrpc": "2.0",
+    "method": "resources/read",
+    "params": {
+        "uri": "resource://shipping_line_updates"
+    },
+    "id": 4
+}'
+event: message
+data: {
+    "jsonrpc": "2.0",
+    "id": 4,
+    "result": {
+        "contents": [
+            {
+                "uri": "resource://shipping_line_updates",
+                "mimeType": "application/json",
+                "text": "{\n  \"id\": \"shipping-line-updates\",\n  \"title\": \"Shipping Line Updates\",\n  \"updates\": {\n    \"SHP001\": {\n      \"shipping_line\": \"Maersk\",\n      \"cargo_category\": \"General\",\n      \"current_status\": \"In Transit\",\n      \"current_location\": \"Singapore\",\n      \"eta\": \"2026-06-15\",\n      \"delay_days\": 0,\n      \"update_note\": \"Shipment departed from Singapore and is moving as scheduled.\"\n    },\n    \"SHP002\": {\n      \"shipping_line\": \"MSC\",\n      \"cargo_category\": \"Temperature Sensitive\",\n      \"current_status\": \"Delayed\",\n      \"current_location\": \"Port Klang\",\n      \"eta\": \"2026-06-18\",\n      \"delay_days\": 3,\n      \"update_note\": \"Shipment is delayed due to port congestion.\"\n    },\n    \"SHP003\": {\n      \"shipping_line\": \"CMA CGM\",\n      \"cargo_category\": \"Perishable\",\n      \"current_status\": \"At Port\",\n      \"current_location\": \"Shanghai\",\n      \"eta\": \"2026-06-20\",\n      \"delay_days\": 1,\n      \"update_note\": \"Container is awaiting vessel loading.\"\n    },\n    \"SHP004\": {\n      \"shipping_line\": \"Hapag-Lloyd\",\n      \"cargo_category\": \"General\",\n      \"current_status\": \"In Transit\",\n      \"current_location\": \"Dubai\",\n      \"eta\": \"2026-06-22\",\n      \"delay_days\": 0,\n      \"update_note\": \"Vessel departed previous port.\"\n    },\n    \"SHP005\": {\n      \"shipping_line\": \"ONE\",\n      \"cargo_category\": \"Perishable\",\n      \"current_status\": \"Delayed\",\n      \"current_location\": \"Antwerp\",\n      \"eta\": \"2026-06-25\",\n      \"delay_days\": 5,\n      \"update_note\": \"Shipment delayed due to severe weather conditions.\"\n    }\n  }\n}"
+            }
+        ]
+    }
+}

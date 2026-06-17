@@ -6,9 +6,15 @@ import json
 
 from mcp_tools.converter_tools import router as converter_router
 
-from mcp_resources.converter_resources import shipping_line_updates
+from mcp_resources.converter_resources import (
+    shipping_line_updates,
+    delay_communication_templates,
+)
 
-from mcp_prompts.converter_prompts import shipment_monitoring_prompt
+from mcp_prompts.converter_prompts import (
+    shipment_monitoring_prompt,
+    delay_communication_prompt,
+)
 
 from utils.logging_utils import build_log_config
 
@@ -78,16 +84,38 @@ mcp = FastMCP.from_fastapi(
     mime_type="application/json",
 )
 def _resource_shipping_line_updates():
-    return json.dumps(shipping_line_updates(), indent=2)
+    return json.dumps(
+        shipping_line_updates(),
+        indent=2,
+    )
 
+
+@mcp.resource(
+    "resource://delay_communication_templates",
+    name="Delay Communication Templates",
+    mime_type="application/json",
+)
+def _resource_delay_communication_templates():
+    return json.dumps(
+        delay_communication_templates(),
+        indent=2,
+    )
 
 # Prompts
 @mcp.prompt(
     name="shipment_monitoring",
-    description="Explain shipment status, cargo risk, and recommended actions.",
+    description="Prompt the assistant to check shipment status and explain cargo risk.",
 )
 def _prompt_shipment_monitoring():
     return shipment_monitoring_prompt()
+
+
+@mcp.prompt(
+    name="delay_communication",
+    description="Prompt the assistant to generate a customer shipment delay communication.",
+)
+def _prompt_delay_communication():
+    return delay_communication_prompt()
 
 
 # Build MCP sub-apps (need lifespan) and mount onto FastAPI

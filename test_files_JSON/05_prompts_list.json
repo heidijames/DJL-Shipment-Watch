@@ -1,0 +1,40 @@
+$ curl -N -X POST "http://localhost:8003/mcp/" \
+-H "Content-Type: application/json" \
+-H "Accept: application/json, text/event-stream" \
+-H "MCP-Protocol-Version: 2025-06-18" \
+-H "mcp-session-id:83384ac54b32471f884e19b237be0961" \
+-d '{
+    "jsonrpc": "2.0",
+    "method": "prompts/list",
+    "params": {},
+    "id": 5
+}'
+event: message
+data: {
+    "jsonrpc": "2.0",
+    "id": 5,
+    "result": {
+        "prompts": [
+            {
+                "name": "shipment_monitoring",
+                "description": "Prompt the assistant to check shipment status and explain cargo risk.",
+                "arguments": [],
+                "_meta": {
+                    "fastmcp": {
+                        "tags": []
+                    }
+                }
+            },
+            {
+                "name": "delay_communication",
+                "description": "Prompt the assistant to generate a customer shipment delay communication.",
+                "arguments": [],
+                "_meta": {
+                    "fastmcp": {
+                        "tags": []
+                    }
+                }
+            }
+        ]
+    }
+}

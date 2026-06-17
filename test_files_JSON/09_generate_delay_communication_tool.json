@@ -1,0 +1,44 @@
+$ curl -N -X POST "http://localhost:8003/mcp/" \
+-H "Content-Type: application/json" \
+-H "Accept: application/json, text/event-stream" \
+-H "MCP-Protocol-Version: 2025-06-18" \
+-H "mcp-session-id:83384ac54b32471f884e19b237be0961" \
+-d '{
+    "jsonrpc": "2.0",
+    "method": "tools/call",
+    "params": {
+        "name": "generate_delay_communication_generate_delay_communicatio",
+        "arguments": {
+            "shipment_id": "SHP002",
+            "delay_severity": "major"
+        }
+    },
+    "id": 9
+}'
+
+event: message
+data: {
+    "jsonrpc": "2.0",
+    "id": 9,
+    "result": {
+        "content": [
+            {
+                "type": "text",
+                "text": "{\"shipment_id\":\"SHP002\",\"shipping_line\":\"MSC\",\"current_status\":\"Delayed\",\"current_location\":\"Port Klang\",\"eta\":\"2026-06-18\",\"delay_days\":3,\"delay_severity\":\"major\",\"cause_of_delay\":\"Shipment is delayed due to port congestion.\",\"customer_message\":\"Shipment SHP002 with MSC is experiencing a major delay. The shipment is currently at Port Klang, with an estimated arrival date of 2026-06-18. Reason noted: Shipment is delayed due to port congestion. Our logistics team is actively monitoring the issue and will provide further updates as soon as possible.\",\"follow_up_required\":true}"
+            }
+        ],
+        "structuredContent": {
+            "shipment_id": "SHP002",
+            "shipping_line": "MSC",
+            "current_status": "Delayed",
+            "current_location": "Port Klang",
+            "eta": "2026-06-18",
+            "delay_days": 3,
+            "delay_severity": "major",
+            "cause_of_delay": "Shipment is delayed due to port congestion.",
+            "customer_message": "Shipment SHP002 with MSC is experiencing a major delay. The shipment is currently at Port Klang, with an estimated arrival date of 2026-06-18. Reason noted: Shipment is delayed due to port congestion. Our logistics team is actively monitoring the issue and will provide further updates as soon as possible.",
+            "follow_up_required": true
+        },
+        "isError": false
+    }
+}
