@@ -1,4 +1,4 @@
-# Unit Converter API + MCP (tools, resources, prompts)
+# DJL Shipment Watch API + MCP Server
 # Uses FastAPI for HTTP routes and FastMCP to expose tools/resources/prompts over HTTP/SSE transports.
 from fastapi import FastAPI, APIRouter
 from fastmcp import FastMCP
